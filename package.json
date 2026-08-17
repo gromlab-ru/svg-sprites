@@ -1,6 +1,6 @@
 {
   "name": "@gromlab/svg-sprites",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Generate external SVG sprites and typed native icon components for modern web frameworks",
   "type": "module",
   "main": "./dist/index.js",
@@ -57,8 +57,8 @@
   "scripts": {
     "build": "npm run build:package",
     "build:package": "tsup && tsup --config tsup.browser.config.ts && tsup --config tsup.viewer.config.ts",
-    "build:skill": "node skills/svg-sprites/build.mjs",
-    "check:skill": "node skills/svg-sprites/build.mjs --check",
+    "build:skill": "node src/skills/svg-sprites/build.mjs",
+    "check:skill": "node src/skills/svg-sprites/build.mjs --check",
     "dev": "tsup --watch",
     "test": "npm run build:package && node --test test/*.test.mjs",
     "typecheck": "tsc --noEmit",

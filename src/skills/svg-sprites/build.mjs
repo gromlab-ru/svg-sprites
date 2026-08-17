@@ -15,7 +15,9 @@ import { fileURLToPath } from 'node:url'
 import configs from './skill.config.mjs'
 
 const skillDir = path.dirname(fileURLToPath(import.meta.url))
-const artifactsDir = path.resolve(skillDir, '../artifacts')
+const repositoryRoot = path.resolve(skillDir, '../../..')
+const outputRoot = path.join(repositoryRoot, 'skills')
+const temporaryParent = path.join(repositoryRoot, '.tmp')
 const includePattern = /<!--\s*include:\s*(.*?)\s*-->/g
 const isCheck = process.argv.slice(2).includes('--check')
 
@@ -114,7 +116,7 @@ function renderSkill(config, document) {
   return [
     ...frontmatter,
     '',
-    `<!-- Generated from skills/svg-sprites/${document.entry}. Do not edit manually. -->`,
+    `<!-- Generated from src/skills/svg-sprites/${document.entry}. Do not edit manually. -->`,
     '',
     body,
     '',
@@ -168,8 +170,9 @@ function prepareConfig(config) {
     throw new Error(`Skill documents must be a non-empty array: ${config.name}`)
   }
 
-  const outputDir = path.resolve(skillDir, config.output)
-  assertInside(artifactsDir, outputDir)
+  assertSafeRelativePath(config.output)
+  const outputDir = path.resolve(outputRoot, config.output)
+  assertInside(outputRoot, outputDir)
 
   const documents = config.documents.map((document) => {
     assertSafeRelativePath(document.entry)
@@ -190,7 +193,14 @@ function prepareConfig(config) {
     targets.add(entry.to)
   }
 
-  return { config, outputDir, documents, copies, expectedFiles: [...targets].sort() }
+  return {
+    config,
+    outputDir,
+    outputPath: path.relative(outputRoot, outputDir),
+    documents,
+    copies,
+    expectedFiles: [...targets].sort(),
+  }
 }
 
 function writeArtifactFile(targetDir, relativePath, content) {
@@ -305,10 +315,46 @@ function validateArtifact(prepared, skillRoot) {
   }
 }
 
+function assertArtifactDirectory(directory) {
+  if (!existsSync(directory)) {
+    throw new Error('Generated skills are missing. Run npm run build:skill.')
+  }
+  const stats = lstatSync(directory)
+  if (stats.isSymbolicLink() || !stats.isDirectory()) {
+    throw new Error(`Skill output must be a directory without symlinks: ${directory}`)
+  }
+}
+
+function assertArtifactsCurrent(stagedRoot) {
+  assertArtifactDirectory(outputRoot)
+  const expectedFiles = listFiles(stagedRoot).sort()
+  const actualFiles = listFiles(outputRoot).sort()
+  const expectedSet = new Set(expectedFiles)
+  const actualSet = new Set(actualFiles)
+  const missingFiles = expectedFiles.filter((file) => !actualSet.has(file))
+  const unexpectedFiles = actualFiles.filter((file) => !expectedSet.has(file))
+  const changedFiles = expectedFiles.filter((file) => (
+    actualSet.has(file)
+    && !readFileSync(path.join(stagedRoot, file)).equals(readFileSync(path.join(outputRoot, file)))
+  ))
+
+  if (missingFiles.length || unexpectedFiles.length || changedFiles.length) {
+    const details = [
+      ...missingFiles.map((file) => `Missing: ${file}`),
+      ...unexpectedFiles.map((file) => `Unexpected: ${file}`),
+      ...changedFiles.map((file) => `Changed: ${file}`),
+    ]
+    throw new Error(`Generated skills are out of date. Run npm run build:skill.\n${details.join('\n')}`)
+  }
+}
+
 function replaceDirectory(stagedDir, outputDir) {
-  const backupDir = `${outputDir}.backup-${process.pid}`
+  const backupDir = path.join(path.dirname(stagedDir), `.skills-backup-${process.pid}`)
   rmSync(backupDir, { recursive: true, force: true })
-  if (existsSync(outputDir)) renameSync(outputDir, backupDir)
+  if (existsSync(outputDir)) {
+    assertArtifactDirectory(outputDir)
+    renameSync(outputDir, backupDir)
+  }
   try {
     renameSync(stagedDir, outputDir)
     rmSync(backupDir, { recursive: true, force: true })
@@ -339,21 +385,23 @@ for (const [index, prepared] of preparedConfigs.entries()) {
   }
 }
 
-mkdirSync(artifactsDir, { recursive: true })
-const temporaryRoot = mkdtempSync(path.join(artifactsDir, '.skills-build-'))
+mkdirSync(temporaryParent, { recursive: true })
+const temporaryRoot = mkdtempSync(path.join(temporaryParent, 'skills-build-'))
 try {
   for (const prepared of preparedConfigs) {
-    const stagedDir = path.join(temporaryRoot, prepared.config.name)
+    const stagedDir = path.join(temporaryRoot, prepared.outputPath)
     buildSkill(prepared, stagedDir)
     validateArtifact(prepared, stagedDir)
   }
 
-  for (const prepared of preparedConfigs) {
-    const stagedDir = path.join(temporaryRoot, prepared.config.name)
-    if (isCheck) {
-      console.log(`Skill sources are valid: ${prepared.config.name}`)
-    } else {
-      replaceDirectory(stagedDir, prepared.outputDir)
+  if (isCheck) {
+    assertArtifactsCurrent(temporaryRoot)
+    for (const prepared of preparedConfigs) {
+      console.log(`Skill artifact is up to date: ${prepared.config.name}`)
+    }
+  } else {
+    replaceDirectory(temporaryRoot, outputRoot)
+    for (const prepared of preparedConfigs) {
       console.log(`Built skill: ${path.relative(process.cwd(), prepared.outputDir)}`)
     }
   }

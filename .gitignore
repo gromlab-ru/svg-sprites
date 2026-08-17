@@ -5,7 +5,6 @@ test/public/
 test/.next-fixture-*/
 test-results/
 .tmp/
-skills/artifacts/
 *.generated.ts
 *.tgz
 .DS_Store
