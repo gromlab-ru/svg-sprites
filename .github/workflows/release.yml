@@ -78,10 +78,10 @@ jobs:
         run: npm pack --ignore-scripts --pack-destination release
 
       - name: Pack skills
-        working-directory: skills/artifacts
+        working-directory: skills
         run: |
-          zip -r ../../release/svg-sprites.zip svg-sprites
-          zip -r ../../release/svg-sprites-ru.zip svg-sprites-ru
+          zip -r ../release/svg-sprites.zip svg-sprites
+          zip -r ../release/svg-sprites-ru.zip svg-sprites-ru
 
       - name: Create checksums
         run: sha256sum release/* > release/SHA256SUMS
