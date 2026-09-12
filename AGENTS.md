@@ -124,3 +124,7 @@ mode A -X-> shared output codegen
 2. Не переносите output-логику в core ради устранения дублирования.
 3. Не меняйте generated-контракты других adapters автоматически.
 4. Проверяйте отсутствие cross-mode imports.
+
+## AI skills
+
+При изменении исходников или сборки skills следуйте `src/skills/README.md`. После изменения выполните `npm run build:skill`, `npm run check:skills` и `npm run test:skills`.

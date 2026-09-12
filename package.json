@@ -59,6 +59,8 @@
     "build:package": "tsup && tsup --config tsup.browser.config.ts && tsup --config tsup.viewer.config.ts",
     "build:skill": "node src/skills/svg-sprites/build.mjs",
     "check:skill": "node src/skills/svg-sprites/build.mjs --check",
+    "check:skills": "node scripts/check-skills.mjs && npm run check:skill",
+    "test:skills": "node --test test/skills.test.mjs",
     "dev": "tsup --watch",
     "test": "npm run build:package && node --test test/*.test.mjs",
     "typecheck": "tsc --noEmit",
@@ -67,7 +69,7 @@
     "integration:build": "npm run build:package && npm run build --prefix integration",
     "integration:test": "npm run test:e2e --prefix integration",
     "integration:verify": "npm run build:package && npm run verify --prefix integration",
-    "verify": "npm run check:skill && npm run typecheck && npm test",
+    "verify": "npm run check:skills && npm run typecheck && npm test",
     "prepack": "npm run verify && npm run build"
   },
   "keywords": [
@@ -127,6 +129,7 @@
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "tsup": "^8.4.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "yaml": "2.9.0"
   }
 }

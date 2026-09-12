@@ -3,7 +3,7 @@ name: svg-sprites-ru
 description: "Используй только при настройке, изменении или диагностике @gromlab/svg-sprites. Триггеры: @gromlab/svg-sprites, svg-sprite.config.json, defineSpriteConfig, generateSprite, standalone@server, source: remote, ServerSvgInput, exact modes для standalone, React, Next.js, Vue, Nuxt, Svelte, Angular, Astro, Solid, Preact, Qwik, Lit или Alpine.js, SpriteConfig.input, --input, SpriteViewer и --icon-color-N. НЕ используй для самописных SVG-спрайтов, inline SVG, favicon, растровых изображений, icon fonts или выбора библиотеки иконок."
 ---
 
-<!-- Generated from src/skills/svg-sprites/src/ru/SKILL.md. Do not edit manually. -->
+<!-- Generated from src/skills/svg-sprites/src/ru/SKILL.source.md. Do not edit manually. -->
 
 # @gromlab/svg-sprites
 

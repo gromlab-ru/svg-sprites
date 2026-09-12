@@ -9,7 +9,7 @@ const agentReferences = {
 
 function documents(language) {
   return [
-    { entry: `src/${language}/SKILL.md`, to: 'SKILL.md', skill: true },
+    { entry: `src/${language}/SKILL.source.md`, to: 'SKILL.md', skill: true },
     ...agentReferences[language].map((file) => ({
       entry: `src/${language}/references/${file}`,
       to: `references/${file}`,
