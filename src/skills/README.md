@@ -6,12 +6,14 @@
 
 ```text
 src/{en,ru}/
-├── SKILL.md
+├── SKILL.source.md
 └── references/
     └── complex-svg.md
 ```
 
-Каждый `SKILL.md` содержит обязательные знания о пакете, рабочий процесс агента и operational map canonical-документации. Exact-mode настройка берётся из canonical guides, а не дублируется отдельными source-фрагментами. Agent-specific `complex-svg.md` остаётся отдельным reference.
+Каждый `SKILL.source.md` содержит обязательные знания о пакете, рабочий процесс агента и карту основной документации. Настройка конкретного mode берётся из его руководства. Документ `complex-svg.md` остаётся отдельным справочником для агента.
+
+Имя `SKILL.md` зарезервировано для готовых skills в `skills/<имя>/`. Заготовки называются `SKILL.source.md` и не содержат frontmatter: сборщик добавляет его из `skill.config.mjs`. Это исключает обнаружение заготовок как отдельных skills при `npx skills update`.
 
 Английский artifact дополнительно получает без изменений `README.md` и содержательную пользовательскую документацию из `docs/en/`; русский — `README_RU.md` и `docs/ru/`. Локальный редакторский `guides/AGENTS.md`, а также навигационные `guides/README.md` и `reference/README.md` не копируются. Canonical-файлы находятся в `references/README.md` и `references/docs/en/` либо в `references/README_RU.md` и `references/docs/ru/`.
 
@@ -29,6 +31,10 @@ Include раскрываются рекурсивно, путь считаетс
 
 ```bash
 npm run build:skill
+npm run check:skills
+npm run test:skills
 ```
 
 Команда собирает и валидирует обе языковые версии, затем атомарно заменяет корневой каталог `skills/`. Сборщик проверяет точный список файлов, безопасные пути, symlink, Markdown fences, локальные ссылки и anchors, единственный H1, frontmatter, размер основного документа и отсутствие `TODO`. `npm run check:skill` дополнительно проверяет, что версионируемые артефакты совпадают с результатом сборки.
+
+`check:skills` сначала проверяет всё Git-дерево и новые неигнорируемые файлы: `SKILL.md` разрешён только в `skills/<имя>/`, имя должно совпадать с каталогом и быть уникальным, а `name` и `description` — непустыми строками в корректном YAML. Затем выполняется существующая проверка `check:skill`. Общая проверка входит в `verify`, CI и выпуск пакета. `test:skills` отдельно запускает регрессионные тесты обнаружения skills; они также входят в основной набор тестов.

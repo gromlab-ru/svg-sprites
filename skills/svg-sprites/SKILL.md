@@ -3,7 +3,7 @@ name: svg-sprites
 description: "Use only when configuring, generating, or troubleshooting @gromlab/svg-sprites. Triggers: @gromlab/svg-sprites, svg-sprite.config.json, defineSpriteConfig, generateSprite, standalone@server, source: remote, ServerSvgInput, exact modes for standalone, React, Next.js, Vue, Nuxt, Svelte, Angular, Astro, Solid, Preact, Qwik, Lit, or Alpine.js, SpriteConfig.input, --input, SpriteViewer, or --icon-color-N. Do NOT use for custom SVG sprites, favicons, raster images, icon fonts, choosing an icon set, or inline SVG without this package."
 ---
 
-<!-- Generated from src/skills/svg-sprites/src/en/SKILL.md. Do not edit manually. -->
+<!-- Generated from src/skills/svg-sprites/src/en/SKILL.source.md. Do not edit manually. -->
 
 # @gromlab/svg-sprites
 
